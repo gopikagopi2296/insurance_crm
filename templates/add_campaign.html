@@ -1,0 +1,157 @@
+{% extends "base2.html" %}
+{% block title %}Add Campaign | SecureLife{% endblock %}
+
+{% block content %}
+
+
+<div class="container-fluid">
+  <div class="row justify-content-center">
+    <div class="col-lg-8 col-md-10">
+
+      <div class="card shadow-sm border-0 p-2 mt-2 mb-3">
+        <div class="card-header text-white text-center" style="background-color:#085A8C;">
+          <h5 class="mb-0">Add Campaign</h5>
+        </div>
+
+        <div class="card-body">
+
+          <!-- Messages -->
+          {% if messages %}
+            {% for message in messages %}
+              <div class="alert alert-{{ message.tags }} alert-dismissible fade show mt-2">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert">
+                  <span>&times;</span>
+                </button>
+              </div>
+            {% endfor %}
+          {% endif %}
+
+          <!-- Form -->
+          <form method="POST" id="simpleform" action="{% url 'add_campaigndb' %}">
+            {% csrf_token %}
+
+            <div class="form-group">
+              <label>Campaign Name <span class="text-danger">*</span></label>
+              <input type="text" name="campaign_name" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+              <label>Date <span class="text-danger">*</span></label>
+              <input type="date" name="date" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+              <label>Time <span class="text-danger">*</span></label>
+              <input type="time" name="time" class="form-control" required>
+            </div>
+
+          <div class="form-group">
+            <label>Location <span class="text-danger">*</span></label>
+
+            <div id="map" style="height:350px;border-radius:8px;"></div>
+
+            <input type="hidden" name="place" id="place">
+            <input type="hidden" name="latitude" id="lat">
+            <input type="hidden" name="longitude" id="lng">
+          </div>
+
+
+            <div class="form-group">
+              <label>Assign Agent <span class="text-danger">*</span></label>
+              <select name="agent_id" class="form-control" required>
+                <option value="">Select Agent</option>
+                {% for a in agents %}
+                  <option value="{{ a.id }}">
+                    {{ a.user.first_name }} {{ a.user.last_name }}
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="d-flex justify-content-center mt-4">
+              <button type="submit" class="btn" style="background-color:#085A8C;color:white;">
+                Add Campaign
+              </button>
+            </div>
+
+          </form>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+/>
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css"
+/>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+
+
+<script>
+  // Init map
+  const map = L.map('map').setView([10.8505, 76.2711], 7); // Kerala
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(map);
+
+  // Marker
+  let marker = L.marker([10.8505, 76.2711], { draggable: true }).addTo(map);
+
+  // 🔍 Search bar INSIDE map
+  const geocoder = L.Control.geocoder({
+    defaultMarkGeocode: false,
+    placeholder: 'Search location'
+  })
+  .on('markgeocode', function (e) {
+    const center = e.geocode.center;
+
+    map.setView(center, 15);
+    marker.setLatLng(center);
+
+    updateLocation(e.geocode.name, center.lat, center.lng);
+  })
+  .addTo(map);
+
+  // 🖱 Click map to select
+  map.on('click', function (e) {
+    marker.setLatLng(e.latlng);
+    reverseGeocode(e.latlng.lat, e.latlng.lng);
+  });
+
+  // 🧲 Drag marker
+  marker.on('dragend', function () {
+    const pos = marker.getLatLng();
+    reverseGeocode(pos.lat, pos.lng);
+  });
+
+  // Reverse geocode (FREE)
+  function reverseGeocode(lat, lng) {
+    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
+      .then(res => res.json())
+      .then(data => {
+        updateLocation(data.display_name, lat, lng);
+      });
+  }
+
+  function updateLocation(address, lat, lng) {
+    document.getElementById("place").value = address;
+    document.getElementById("lat").value = lat;
+    document.getElementById("lng").value = lng;
+  }
+</script>
+
+
+
+{% endblock %}

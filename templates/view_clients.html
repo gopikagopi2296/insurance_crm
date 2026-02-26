@@ -1,0 +1,67 @@
+{% extends "base3.html" %}
+{% block title %}Clients | SecureLife{% endblock %}
+
+{% block content %}
+<div class="container-fluid " style="margin-bottom:550px;">
+          <!-- Messages -->
+          {% if messages %}
+            {% for message in messages %}
+              <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+              </div>
+            {% endfor %}
+          {% endif %}
+  <h4 class="mb-4" style="color:#085A8C;">My Clients</h4>
+
+  <div class="row">
+
+    {% for c in clients %}
+    <div class="col-md-4 mb-4 ">
+      <div class="card shadow-sm h-100">
+
+        <div class="card-body">
+          <h5 class="mb-2">{{ c.user.get_full_name }}</h5>
+
+          <p class="mb-1">
+            <strong>Email:</strong> {{ c.user.email }}
+          </p>
+          <p class="mb-1">
+            <strong>Mobile:</strong> {{ c.mobile }}
+          </p>
+        </div>
+        <div class="card-footer bg-white  d-flex justify-content-center  align-items-center">
+
+        <a href="{% url 'client_detail' c.id %}"
+            class="btn btn-sm btn-outline mr-2" style="color:#085A8C; border:1px solid #085A8C;"
+            title="View Client">
+            <i class="fas fa-eye"></i>View
+        </a>
+
+        <a href="{% url 'edit_client' c.id %}"
+            class="btn btn-sm btn-outline-warning mr-2"
+            title="Edit Client">
+            <i class="fas fa-edit"></i>Edit
+        </a>
+
+        <a href="{% url 'delete_client' c.id %}"
+            class="btn btn-sm btn-outline-danger"
+            title="Delete Client"
+            onclick="return confirm('Delete this client?');">
+            <i class="fas fa-trash"></i>Delete
+        </a>
+
+        </div>
+
+
+      </div>
+    </div>
+    {% empty %}
+    <div class="col-12 text-center mt-5">
+      <p class="text-muted">No clients found.</p>
+    </div>
+    {% endfor %}
+
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,116 @@
+{% extends "base3.html" %}
+{% block title %}Client Details | SecureLife{% endblock %}
+
+{% block content %}
+<div class="container-fluid my-3">
+
+  <div class="card shadow-sm border-0">
+
+    <!-- HEADER -->
+    <div class="card-header d-flex align-items-center"
+         style="background:#085A8C;color:white;">
+      
+      {% if client.image %}
+        <img src="{{ client.image.url }}"
+             class="rounded-circle mr-3"
+             width="60" height="60"
+             style="object-fit:cover;">
+      {% else %}
+        <div class="rounded-circle bg-light text-dark d-flex align-items-center
+                    justify-content-center mr-3"
+             style="width:60px;height:60px;">
+          <i class="fas fa-user fa-lg"></i>
+        </div>
+      {% endif %}
+
+      <div>
+        <h5 class="mb-0">{{ client.user.get_full_name }}</h5>
+        <small>{{ client.user.email }}</small>
+      </div>
+    </div>
+
+    <!-- BODY -->
+    <div class="card-body">
+
+      <!-- BASIC INFO -->
+      <h6 class="mb-3 font-weight-bold" style="color:#085A8C;">
+        Personal Information
+      </h6>
+
+      <div class="row">
+        <div class="col-md-6">
+          <p><strong>Mobile:</strong> {{ client.mobile }}</p>
+          <p><strong>Qualification:</strong> {{ client.qualification }}</p>
+          <p><strong>Salary:</strong> ₹ {{ client.salary }}</p>
+          <p><strong>Marital Status:</strong> {{ client.marital_status|title }}</p>
+          <p><strong>Children:</strong> {{ client.children|default:"N/A" }}</p>
+        </div>
+
+        <div class="col-md-6">
+          <p><strong>Aadhaar:</strong> {{ client.aadhar }}</p>
+          <p><strong>PAN:</strong> {{ client.pan }}</p>
+          <p><strong>Campaign:</strong> {{ client.campaign.campaign_name }}</p>
+          <p><strong>Agent:</strong> {{ client.agent.user.get_full_name }}</p>
+        </div>
+      </div>
+
+      <hr>
+
+      <!-- POLICY INFO -->
+      <h6 class="mb-3 font-weight-bold" style="color:#085A8C;">
+        Policy Details
+      </h6>
+
+      <div class="row">
+        <div class="col-md-6">
+          <p><strong>Previous Policy:</strong> {{ client.previous_policy|title }}</p>
+          <p><strong>Willing to Switch:</strong>
+            {{ client.willing_to_switch|default:"N/A"|title }}
+          </p>
+        </div>
+
+        <div class="col-md-6">
+          <p><strong>Policy Number:</strong>
+            {{ client.policy_number|default:"N/A" }}
+          </p>
+          <p><strong>Rating:</strong>
+            {{ client.rating|default:"N/A" }}/5
+          </p>
+        </div>
+      </div>
+
+      <hr>
+
+      <!-- FEEDBACK -->
+      <h6 class="mb-3 font-weight-bold" style="color:#085A8C;">
+        Feedback
+      </h6>
+
+      <p><strong>Experience:</strong>
+        {{ client.experience|default:"No experience provided." }}
+      </p>
+
+      <p><strong>Overall Feedback:</strong>
+        {{ client.feedback|default:"No feedback provided." }}
+      </p>
+
+      <hr>
+
+      <!-- ADDRESS -->
+      <h6 class="mb-2 font-weight-bold" style="color:#085A8C;">
+        Address
+      </h6>
+      <p>{{ client.address }}</p>
+
+      <!-- ACTIONS -->
+      <div class="text-center mt-4">
+        <a href="{% url 'view_clients' %}" class="btn btn-secondary">
+          <i class="fas fa-arrow-left mr-1"></i> Back to Clients
+        </a>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+{% endblock %}

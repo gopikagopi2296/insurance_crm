@@ -1,0 +1,141 @@
+{% extends "base2.html" %}
+{% block title %}Edit Campaign | SecureLife{% endblock %}
+
+{% block content %}
+<div class="container-fluid my-3">
+  <div class="row justify-content-center">
+    <div class="col-lg-8 col-md-10">
+
+      <div class="card shadow-sm border-0">
+        <div class="card-header text-white text-center" style="background:#085A8C;">
+          <h5>Edit Campaign</h5>
+        </div>
+
+        <div class="card-body">
+          <form method="POST">
+            {% csrf_token %}
+
+            <div class="form-group">
+              <label>Campaign Name</label>
+              <input type="text" name="campaign_name"
+                     value="{{ campaign.campaign_name }}"
+                     class="form-control" required>
+            </div>
+
+            <div class="form-group">
+              <label>Date</label>
+              <input type="date" name="date" value="{{ campaign.date |date:'Y-m-d'  }}" class="form-control"  required>
+            </div>
+
+            <div class="form-group">
+              <label>Time</label>
+              <input type="time" name="time"
+                     value="{{ campaign.time |time:'H:i' }}"
+                     class="form-control" required>
+            </div>
+
+            <!-- MAP -->
+            <div class="form-group">
+              <label>Location</label>
+              <div id="map" style="height:350px;border-radius:8px;"></div>
+
+              <input type="hidden" name="place" id="place" value="{{ campaign.place }}">
+              <input type="hidden" name="latitude" id="lat" value="{{ campaign.latitude }}">
+              <input type="hidden" name="longitude" id="lng" value="{{ campaign.longitude }}">
+            </div>
+
+            <div class="form-group">
+              <label>Agent</label>
+              <select name="agent_id" class="form-control" required>
+                {% for a in agents %}
+                  <option value="{{ a.id }}"
+                    {% if a.id == campaign.agent.id %}selected{% endif %}>
+                    {{ a.user.first_name }} {{ a.user.last_name }}
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="text-center">
+              <button class="btn"  style="background-color: #085A8C;color:white;">Update Campaign</button>
+              <a href="{% url 'view_campaigns' %}" class="btn btn-secondary ml-2">
+                Cancel
+              </a>
+            </div>
+
+          </form>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- LEAFLET -->
+<link rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet"
+      href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+
+
+<script>
+  const map = L.map('map')
+    .setView([{{ campaign.latitude }}, {{ campaign.longitude }}], 14);
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(map);
+
+  const marker = L.marker(
+    [{{ campaign.latitude }}, {{ campaign.longitude }}],
+    { draggable: true }
+  ).addTo(map);
+
+  // 🔍 SEARCH BAR INSIDE MAP (FREE)
+  const geocoder = L.Control.geocoder({
+    defaultMarkGeocode: false,
+    placeholder: 'Search location'
+  })
+  .on('markgeocode', function (e) {
+    const center = e.geocode.center;
+
+    map.setView(center, 15);
+    marker.setLatLng(center);
+
+    updateLocation(e.geocode.name, center.lat, center.lng);
+  })
+  .addTo(map);
+
+  // 🖱 Click on map
+  map.on('click', function (e) {
+    marker.setLatLng(e.latlng);
+    reverseGeocode(e.latlng.lat, e.latlng.lng);
+  });
+
+  // 🧲 Drag marker
+  marker.on('dragend', function () {
+    const pos = marker.getLatLng();
+    reverseGeocode(pos.lat, pos.lng);
+  });
+
+  // Reverse geocode to get address
+  function reverseGeocode(lat, lng) {
+    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
+      .then(res => res.json())
+      .then(data => {
+        updateLocation(data.display_name, lat, lng);
+      });
+  }
+
+  function updateLocation(address, lat, lng) {
+    document.getElementById("place").value = address;
+    document.getElementById("lat").value = lat;
+    document.getElementById("lng").value = lng;
+  }
+</script>
+
+
+{% endblock %}

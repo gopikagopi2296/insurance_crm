@@ -1,0 +1,62 @@
+{% extends "base2.html" %}
+{% block title %}Client Details | Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-3 mb-3" >
+
+  <div class="card shadow-sm">
+    <div class="card-header text-white" style="background:#085A8C;">
+      <h5>{{ client.user.get_full_name }}</h5>
+    </div>
+
+    <div class="card-body">
+      <div class="row">
+
+        <!-- IMAGE -->
+        <div class="col-md-3 text-center">
+          {% if client.image %}
+            <img src="{{ client.image.url }}"
+                 class="rounded-circle mb-3"
+                 style="width:140px;height:140px;object-fit:cover;">
+          {% else %}
+            <i class="fas fa-user-circle fa-7x text-muted"></i>
+          {% endif %}
+        </div>
+
+        <!-- DETAILS -->
+        <div class="col-md-9">
+          <table class="table table-borderless">
+            <tr><th>Email</th><td>{{ client.user.email }}</td></tr>
+            <tr><th>Mobile</th><td>{{ client.mobile }}</td></tr>
+            <tr><th>Qualification</th><td>{{ client.qualification }}</td></tr>
+            <tr><th>Salary</th><td>{{ client.salary }}</td></tr>
+            <tr><th>Marital Status</th><td>{{ client.marital_status }}</td></tr>
+            <tr><th>Children</th><td>{{ client.children }}</td></tr>
+            <tr><th>Previous Policy</th><td>{{ client.previous_policy }}</td></tr>
+            <tr><th>Willing to Switch</th><td>{{ client.willing_to_switch }}</td></tr>
+            <tr><th>Policy Number</th><td>{{ client.policy_number }}</td></tr>
+            <tr><th>Aadhaar</th><td>{{ client.aadhar }}</td></tr>
+            <tr><th>PAN</th><td>{{ client.pan }}</td></tr>
+            <tr><th>Campaign</th><td>{{ client.campaign.campaign_name }}</td></tr>
+            <tr><th>Agent</th><td>{{ client.agent.user.get_full_name }}</td></tr>
+          </table>
+        </div>
+
+      </div>
+
+      <hr>
+
+      <p><strong>Experience:</strong> {{ client.experience }}</p>
+      <p><strong>Feedback:</strong> {{ client.feedback }}</p>
+      <p><strong>Address:</strong> {{ client.address }}</p>
+
+      <div class="text-center mt-3">
+        <a href="{% url 'admin_view_clients' %}" class="btn btn-secondary">
+          Back to Clients
+        </a>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

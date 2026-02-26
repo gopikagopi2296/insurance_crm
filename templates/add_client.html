@@ -1,0 +1,265 @@
+{% extends "base3.html" %}
+{% block title %}Add Client | SecureLife{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="row justify-content-center">
+    <div class="col-lg-8 col-md-10">
+
+      <div class="card shadow-sm border-0 mt-2 mb-3">
+        <div class="card-header text-white text-center" style="background:#085A8C;">
+          <h5 class="mb-0">Add Client</h5>
+        </div>
+
+        <div class="card-body">
+
+          <!-- Messages -->
+          {% if messages %}
+            {% for message in messages %}
+              {% if 'error' in message.tags %}
+                <div class="alert alert-danger alert-dismissible fade show mt-2" role="alert">
+                  {{ message }}
+                  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+              {% else %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show mt-2" role="alert">
+                  {{ message }}
+                  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+
+          <form method="POST" enctype="multipart/form-data" id="clientForm" action="{% url 'add_clientdb' %}">
+            {% csrf_token %}
+
+            <!-- BASIC INFO -->
+            <div class="form-group">
+              <label>First Name <span class="text-danger">*</span></label>
+              <input type="text" name="first_name" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+              <label>Last Name <span class="text-danger">*</span></label>
+              <input type="text" name="last_name" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+              <label>Email <span class="text-danger">*</span></label>
+              <input type="email"
+                    class="form-control validate"
+                    data-field="email"
+                    name="email"
+                    required>
+              <small class="text-danger d-none"></small>
+            </div>
+
+            <div class="form-group">
+              <label>Mobile <span class="text-danger">*</span></label>
+              <input type="text"
+                    class="form-control validate"
+                    data-field="mobile"
+                    name="mobile"
+                    required>
+              <small class="text-danger d-none"></small>
+            </div>
+
+            <!-- PERSONAL -->
+            <div class="form-group">
+              <label>Qualification <span class="text-danger">*</span></label>
+              <input type="text" name="qualification" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+              <label>Salary <span class="text-danger">*</span></label>
+              <input type="number" name="salary" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+              <label>Marital Status <span class="text-danger">*</span></label><br>
+              <label><input type="radio" name="marital" value="married" id="married"  required> Married</label>
+              <label class="ml-3"><input type="radio" name="marital" id="single" value="single"> Single</label>
+            </div>
+
+            <div class="form-group">
+              <label>Number of Children</label>
+              <input type="number" name="children" id="children" class="form-control" min="0" value="">
+            </div>
+
+            <!-- PREVIOUS POLICY -->
+            <div class="form-group">
+              <label>Previous Policy <span class="text-danger">*</span></label><br>
+              <label><input type="radio" name="previous_policy" value="yes" onclick="togglePolicy(true)" required> Yes</label>
+              <label class="ml-3"><input type="radio" name="previous_policy" value="no" onclick="togglePolicy(false)"> No</label>
+            </div>
+
+            <div id="policyFields" style="display:none;">
+              <div class="form-group">
+                <label>Willing to Switch</label><br>
+                <label><input type="radio" name="willing" value="yes"> Yes</label>
+                <label class="ml-3"><input type="radio" name="willing" value="no"> No</label>
+              </div>
+
+              <div class="form-group">
+                <label>Previous Policy Number</label>
+                <input type="text" name="policy_number" class="form-control">
+              </div>
+            </div>
+
+            <!-- RATINGS -->
+            <div class="form-group">
+              <label>Campaign Rating (1–5)</label>
+              <input type="number" name="rating" min="1" max="5" class="form-control">
+            </div>
+
+            <div class="form-group">
+              <label>Experience with Agent</label>
+              <textarea name="experience" class="form-control"></textarea>
+            </div>
+
+            <div class="form-group">
+              <label>Overall Feedback</label>
+              <textarea name="feedback" class="form-control"></textarea>
+            </div>
+
+            <!-- ID -->
+          <div class="form-group">
+            <label>Aadhaar Number <span class="text-danger">*</span></label>
+            <input type="text"
+                  class="form-control validate"
+                  data-field="aadhar"
+                  name="aadhar"
+                  maxlength="12"
+                  required>
+            <small class="text-danger d-none"></small>
+          </div>
+
+          <div class="form-group">
+            <label>PAN Number <span class="text-danger">*</span></label>
+            <input type="text"
+                  class="form-control validate"
+                  data-field="pan"
+                  name="pan"
+                  maxlength="10"
+                  style="text-transform:uppercase"
+                  required>
+            <small class="text-danger d-none"></small>
+          </div>
+
+
+            <!-- ADDRESS -->
+            <div class="form-group">
+              <label>Address <span class="text-danger">*</span></label>
+              <textarea name="address" class="form-control" required></textarea>
+            </div>
+
+            <!-- CAMPAIGN -->
+            <div class="form-group">
+              <label>Campaign <span class="text-danger">*</span></label>
+              <select name="campaign_id" class="form-control" required>
+                <option value="">Select Campaign</option>
+                {% for c in campaigns %}
+                  <option value="{{ c.id }}">{{ c.campaign_name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <!-- IMAGE -->
+            <div class="form-group">
+              <label>Profile Image</label>
+              <input type="file" name="image" class="form-control-file" accept="image/*">
+            </div>
+
+            <div class="text-center mt-4">
+              <button  id="submitBtn" class="btn" style="background:#085A8C;color:white;">
+                Add Client
+              </button>
+            </div>
+
+          </form>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- JS -->
+<script>
+function togglePolicy(show) {
+  document.getElementById("policyFields").style.display = show ? "block" : "none";
+}
+</script>
+<script>
+document.querySelectorAll('.validate').forEach(input => {
+    input.addEventListener('keyup', function () {
+
+        const field = this.dataset.field;
+        let value = this.value.trim();
+        const errorBox = this.nextElementSibling;
+        const submitBtn = document.getElementById('submitBtn');
+
+        if (field === 'pan') {
+            value = value.toUpperCase();
+            this.value = value;
+        }
+
+        // get all required validate fields
+        const email  = document.querySelector('[data-field="email"]').value.trim();
+        const mobile = document.querySelector('[data-field="mobile"]').value.trim();
+        const aadhar = document.querySelector('[data-field="aadhar"]').value.trim();
+        const pan    = document.querySelector('[data-field="pan"]').value.trim();
+
+        if (value.length < 1) {
+            errorBox.classList.add('d-none');
+            return;
+        }
+
+        const url =
+          `/ajax/validate/?field=${field}&value=${value}`;
+        fetch(url)
+            .then(res => res.json())
+            .then(data => {
+                if (!data.valid) {
+                    errorBox.innerText = data.message;
+                    errorBox.classList.remove('d-none');
+                    submitBtn.disabled = true;
+                } else {
+                    errorBox.classList.add('d-none');
+
+                    if (email && mobile && aadhar && pan) {
+                        submitBtn.disabled = false;
+                    }
+                }
+            });
+    });
+});
+</script>
+
+<script>
+  const marriedRadio = document.getElementById("married");
+  const singleRadio = document.getElementById("single");
+  const childrenInput = document.getElementById("children");
+
+  function updateChildrenField() {
+    if (singleRadio.checked) {
+      childrenInput.value = 0;
+      childrenInput.setAttribute("readonly", true);
+    } else {
+      childrenInput.removeAttribute("readonly");
+    }
+  }
+
+  marriedRadio.addEventListener("change", updateChildrenField);
+  singleRadio.addEventListener("change", updateChildrenField);
+
+  // Run once on page load (for edit forms)
+  updateChildrenField();
+</script>
+
+{% endblock %}

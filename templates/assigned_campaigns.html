@@ -1,0 +1,71 @@
+{% extends "base3.html" %}
+{% block title %}Assigned Campaigns | SecureLife{% endblock %}
+
+{% block content %}
+<div class="container-fluid" style="margin-bottom:250px;">
+
+  <h4 class="mb-4 font-weight-bold" style="color:#085A8C;">
+    Assigned Campaigns
+  </h4>
+
+  <div class="row">
+
+    {% for c in campaigns %}
+    <div class="col-lg-6 col-md-12 mb-4">
+      <div class="card shadow-sm border-0 h-100">
+
+        <div class="card-body">
+          <h5 class="font-weight-bold mb-2">{{ c.campaign_name }}</h5>
+
+          <p class="mb-1">
+            <strong>Date:</strong> {{ c.date }} <br>
+            <strong>Time:</strong> {{ c.time }}
+          </p>
+
+          <p class="mb-2">
+            <strong>Location:</strong><br>
+            {{ c.place }}
+          </p>
+
+          <!-- MAP -->
+          <div id="map-{{ c.id }}" style="height:180px;border-radius:6px;"></div>
+        </div>
+
+      </div>
+    </div>
+    {% empty %}
+    <div class="col-12 text-center py-5">
+      <p class="mb-1 font-weight-bold" style="color:#085A8C;">
+        No campaigns assigned
+      </p>
+      <small class="text-muted">
+        You will see campaigns once admin assigns them.
+      </small>
+    </div>
+    {% endfor %}
+
+  </div>
+</div>
+
+<!-- LEAFLET (FREE MAP) -->
+<link rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+  {% for c in campaigns %}
+  (function () {
+    const map = L.map('map-{{ c.id }}', {
+      zoomControl: false,
+      attributionControl: false
+    }).setView([{{ c.latitude }}, {{ c.longitude }}], 14);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png')
+      .addTo(map);
+
+    L.marker([{{ c.latitude }}, {{ c.longitude }}]).addTo(map);
+  })();
+  {% endfor %}
+</script>
+
+{% endblock %}

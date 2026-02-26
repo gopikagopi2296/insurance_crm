@@ -1,0 +1,99 @@
+{% extends "base3.html" %}
+{% load static %}
+
+{% block title %}My Profile{% endblock %}
+
+{% block content %}
+<div class="container mt-4" style="margin-bottom:350px;">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+
+      <div class="card shadow border-0 mb-3">
+
+        <!-- Messages -->
+        {% if messages %}
+          {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+              {{ message }}
+              <button type="button" class="close" data-dismiss="alert">&times;</button>
+            </div>
+          {% endfor %}
+        {% endif %}
+
+        <!-- Header -->
+        <div class="card-header text-white d-flex justify-content-between align-items-center"
+             style="background:#085A8C;">
+          <h5 class="mb-0">
+            <i class="fas fa-user mr-2"></i> My Profile
+          </h5>
+        </div>
+
+        <div class="card-body">
+          <div class="row">
+
+            <!-- Profile Image -->
+            <div class="col-md-4 text-center">
+              {% if agent.img %}
+                <img src="{{ agent.img.url }}"
+                     class="rounded-circle mb-3"
+                     style="width:150px;height:150px;object-fit:cover;">
+              {% else %}
+                <img src="{% static 'images/default-user.png' %}"
+                     class="rounded-circle mb-3"
+                     style="width:150px;height:150px;">
+              {% endif %}
+            </div>
+
+            <!-- Profile Details -->
+            <div class="col-md-8">
+              <table class="table table-borderless mb-0">
+                <tr>
+                  <th>Name</th>
+                  <td>{{ agent.user.first_name }} {{ agent.user.last_name }}</td>
+                </tr>
+                <tr>
+                  <th>Username</th>
+                  <td>{{ agent.user.username }}</td>
+                </tr>
+                <tr>
+                  <th>Email</th>
+                  <td>{{ agent.user.email }}</td>
+                </tr>
+                <tr>
+                  <th>Mobile</th>
+                  <td>{{ agent.phone_number }}</td>
+                </tr>
+                <tr>
+                  <th>Date of Birth</th>
+                  <td>{{ agent.dob|date:"d M Y" }}</td>
+                </tr>
+                <tr>
+                  <th>Specialization</th>
+                  <td>{{ agent.specialization }}</td>
+                </tr>
+              </table>
+
+              <!-- Actions -->
+              <div class="d-flex align-items-center mt-3">
+                <a href="{% url 'edit_profile' %}"
+                   class="btn btn-outline btn-sm mr-2" style="color:#085A8C; border:1px solid #085A8C;">
+                  <i class="fas fa-edit mr-1"></i> Edit Profile
+                </a>
+
+                <a href="{% url 'agenthome' %}"
+                   class="btn btn-secondary btn-sm">
+                  <i class="fas fa-arrow-left mr-1"></i> Back
+                </a>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

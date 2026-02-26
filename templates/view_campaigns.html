@@ -1,0 +1,91 @@
+{% extends "base2.html" %}
+{% block title %}View Campaigns | SecureLife{% endblock %}
+
+{% block content %}
+<div class="container-fluid" style="margin-bottom:550px;">
+
+  <h4 class="mb-3  font-weight-bold"  style="color: #085A8C;">Campaigns</h4>
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+
+  <div class="row">
+
+    {% for c in campaigns %}
+    <div class="col-lg-6 mb-4">
+
+      <div class="card shadow-sm border-0 h-100 d-flex flex-column">
+
+        <div class="card-body">
+
+          <h5 class="font-weight-bold text-dark">{{ c.campaign_name }}</h5>
+
+          <p class="mb-1">
+            <strong>Date:</strong> {{ c.date }} <br>
+            <strong>Time:</strong> {{ c.time }}
+          </p>
+
+          <p class="mb-1">
+            <strong>Agent:</strong>
+            {{ c.agent.user.first_name }} {{ c.agent.user.last_name }}
+          </p>
+
+          <p class="mb-2">
+            <strong>Place:</strong> {{ c.place }}
+          </p>
+
+          <!-- MAP -->
+          <div id="map-{{ c.id }}" style="height:200px;border-radius:6px;"></div>
+
+          <!-- ACTIONS -->
+          <div class="d-flex justify-content-between mt-3">
+            <a href="{% url 'edit_campaign' c.id %}"
+               class="btn btn-sm btn-outline" style="color:#085A8C; border:1px solid #085A8C;">
+              Edit
+            </a>
+
+            <a href="{% url 'delete_campaign' c.id %}"
+               class="btn btn-sm btn-outline-danger"
+               onclick="return confirm('Are you sure you want to delete this campaign?')">
+              Delete
+            </a>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+    {% empty %}
+      <div class="col-12">
+        <p class="text-muted">No campaigns found.</p>
+      </div>
+    {% endfor %}
+
+  </div>
+</div>
+
+<!-- LEAFLET (FREE MAP) -->
+<link rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+  {% for c in campaigns %}
+    (function () {
+      const map = L.map('map-{{ c.id }}', {
+        zoomControl: false,
+        attributionControl: false
+      }).setView([{{ c.latitude }}, {{ c.longitude }}], 14);
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png')
+        .addTo(map);
+
+      L.marker([{{ c.latitude }}, {{ c.longitude }}]).addTo(map);
+    })();
+  {% endfor %}
+</script>
+
+{% endblock %}
